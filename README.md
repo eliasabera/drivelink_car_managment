@@ -53,33 +53,33 @@ The app is built with **React Native (Expo)** and uses **Supabase** as the backe
 DriveLink/
 ├── app/
 │   ├── layout.tsx
-│   ├── index.tsx
+│   ├── index.tsx               # Redirect based on role
 │
 │   ├── (auth)/
 │   │   ├── layout.tsx
-│   │   ├── login/index.tsx
-│   │   └── register/index.tsx
+│   │   ├── login/index.tsx      # -> imports LoginComponent from modules/auth
+│   │   └── register/index.tsx   # -> imports RegisterComponent from modules/auth
 │
 │   ├── (owner)/
 │   │   ├── layout.tsx
-│   │   ├── dashboard/index.tsx
-│   │   ├── cars/index.tsx
-│   │   ├── managers/index.tsx
-│   │   └── reports/index.tsx
+│   │   ├── dashboard/index.tsx  # -> imports DashboardComponent from modules/owner
+│   │   ├── cars/index.tsx       # -> imports CarsComponent from modules/cars
+│   │   ├── managers/index.tsx   # -> imports ManagersComponent from modules/manager
+│   │   └── reports/index.tsx    # -> imports ReportsComponent from modules/reports
 │
 │   ├── (manager)/
 │   │   ├── layout.tsx
-│   │   ├── dashboard/index.tsx
-│   │   ├── work/index.tsx
-│   │   ├── finance/index.tsx
-│   │   └── tracking/index.tsx
+│   │   ├── dashboard/index.tsx  # -> imports DashboardComponent from modules/manager
+│   │   ├── work/index.tsx       # -> imports WorkComponent from modules/assignments
+│   │   ├── finance/index.tsx    # -> imports FinanceComponent from modules/finance
+│   │   └── tracking/index.tsx   # -> imports TrackingComponent from modules/tracking
 │
 │   ├── (driver)/
 │   │   ├── layout.tsx
-│   │   ├── dashboard/index.tsx
-│   │   ├── activity/index.tsx
-│   │   ├── my-car/index.tsx
-│   │   └── tracking/index.tsx
+│   │   ├── dashboard/index.tsx  # -> imports DashboardComponent from modules/driver
+│   │   ├── activity/index.tsx   # -> imports ActivityComponent from modules/activity
+│   │   ├── my-car/index.tsx     # -> imports MyCarComponent from modules/cars
+│   │   └── tracking/index.tsx   # -> imports TrackingComponent from modules/tracking
 │
 │   └── unauthorized.tsx
 │
@@ -157,8 +157,6 @@ DriveLink/
 ├── package.json
 ├── tsconfig.json
 └── README.md
-
-````
 
 ---
 
