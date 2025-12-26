@@ -84,15 +84,4 @@ expo start
 
 ---
 
-## 📄 License
 
-
-
-```
-
----
-
-If you want, I can also **add a visual diagram of the folder structure** inside this README for better clarity — like a GitHub-style tree diagram with icons for modules, tabs, and components.  
-
-Do you want me to do that?
-```
