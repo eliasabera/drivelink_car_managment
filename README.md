@@ -1,50 +1,214 @@
-# Welcome to your Expo app 👋
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-## Get started
+# `README.md` for DriveLink
 
-1. Install dependencies
+```markdown
+# DriveLink - Car & Driver Management System
 
-   ```bash
-   npm install
-   ```
+DriveLink is a **mobile-based fleet management system** that allows car owners, managers, and drivers to efficiently manage cars, daily activities, expenses, revenues, and live location tracking.  
+The app is built with **React Native (Expo)** and uses **Supabase** as the backend.
 
-2. Start the app
+---
 
-   ```bash
-   npx expo start
-   ```
+## ✅ Features
 
-In the output, you'll find options to open the app in a
+### **Owner**
+- Create manager and driver accounts
+- Assign cars to managers
+- Assign drivers to cars
+- Monitor car and driver activity
+- View full reports
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### **Manager**
+- Manage assigned cars
+- Manage drivers under assigned cars
+- Track drivers via GPS
+- Add or edit income/expense logs
+- Review driver activity reports
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### **Driver**
+- Log daily income
+- Log daily expenses
+- View assigned car details
+- Share live location via GPS
+- Call manager if unable to fill logs
 
-## Get a fresh project
+---
 
-When you're ready, run:
+## 🎨 Design & Style
 
-```bash
-npm run reset-project
+- **Design style**: Modern minimal + soft neumorphism
+- **Layout**: Card-based
+- **Navigation**: Floating rounded bottom tab bar (icons only)
+- **Colors**: Neutral base with limited accents (yellow, orange, soft gray)
+- **Typography**: Clean sans-serif with strong hierarchy
+- **Minimalism**: High, content-first, distraction-free
+
+---
+
+## 🗂 Folder Structure
+
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+DriveLink/
+├── app/
+│   ├── layout.tsx
+│   ├── index.tsx
+│
+│   ├── (auth)/
+│   │   ├── layout.tsx
+│   │   ├── login/index.tsx
+│   │   └── register/index.tsx
+│
+│   ├── (owner)/
+│   │   ├── layout.tsx
+│   │   ├── dashboard/index.tsx
+│   │   ├── cars/index.tsx
+│   │   ├── managers/index.tsx
+│   │   └── reports/index.tsx
+│
+│   ├── (manager)/
+│   │   ├── layout.tsx
+│   │   ├── dashboard/index.tsx
+│   │   ├── work/index.tsx
+│   │   ├── finance/index.tsx
+│   │   └── tracking/index.tsx
+│
+│   ├── (driver)/
+│   │   ├── layout.tsx
+│   │   ├── dashboard/index.tsx
+│   │   ├── activity/index.tsx
+│   │   ├── my-car/index.tsx
+│   │   └── tracking/index.tsx
+│
+│   └── unauthorized.tsx
+│
+├── src/
+│   ├── modules/
+│   │   ├── auth/
+│   │   │   ├── LoginComponent.tsx
+│   │   │   ├── RegisterComponent.tsx
+│   │   │   └── authUtils.ts
+│   │   │
+│   │   ├── owner/
+│   │   │   ├── DashboardComponent.tsx
+│   │   │   └── ReportsComponent.tsx
+│   │   │
+│   │   ├── manager/
+│   │   │   ├── DashboardComponent.tsx
+│   │   │   └── ManagersComponent.tsx
+│   │   │
+│   │   ├── driver/
+│   │   │   ├── DashboardComponent.tsx
+│   │   │   └── ActivityComponent.tsx
+│   │   │
+│   │   ├── cars/
+│   │   │   ├── CarsComponent.tsx
+│   │   │   └── MyCarComponent.tsx
+│   │   │
+│   │   ├── finance/
+│   │   │   └── FinanceComponent.tsx
+│   │   │
+│   │   ├── assignments/
+│   │   │   └── WorkComponent.tsx
+│   │   │
+│   │   ├── tracking/
+│   │   │   └── TrackingComponent.tsx
+│   │   │
+│   │   └── announcements/
+│   │       └── AnnouncementsComponent.tsx
+│   │
+│   ├── shared/
+│   │   ├── services/
+│   │   │   ├── supabase.ts
+│   │   │   ├── auth-service.ts
+│   │   │   ├── user-service.ts
+│   │   │   ├── car-service.ts
+│   │   │   ├── expense-service.ts
+│   │   │   ├── revenue-service.ts
+│   │   │   └── tracking-service.ts
+│   │   │
+│   │   ├── store/
+│   │   │   ├── auth-store.ts
+│   │   │   ├── user-store.ts
+│   │   │   ├── car-store.ts
+│   │   │   ├── expense-store.ts
+│   │   │   ├── revenue-store.ts
+│   │   │   ├── tracking-store.ts
+│   │   │   └── ui-store.ts
+│   │   │
+│   │   ├── types/
+│   │   │   ├── user.ts
+│   │   │   ├── car.ts
+│   │   │   ├── expense.ts
+│   │   │   ├── revenue.ts
+│   │   │   └── tracking.ts
+│   │
+│   ├── hooks/
+│   │   ├── useAuth.ts
+│   │   ├── useRole.ts
+│   │   └── useTracking.ts
+│   │
+│   └── utils/
+│       ├── helpers.ts
+│       └── permissions.ts
+│
+├── app.json
+├── package.json
+├── tsconfig.json
+└── README.md
 
-## Learn more
+````
 
-To learn more about developing your project with Expo, look at the following resources:
+---
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## ⚡ Technologies
 
-## Join the community
+- **Frontend:** React Native (Expo), Expo Router
+- **Backend:** Supabase (Auth, Database, Realtime)
+- **State Management:** Zustand or similar
+- **Language:** TypeScript
+- **Design Style:** Modern minimal + soft neumorphism, card-based
 
-Join our community of developers creating universal apps.
+---
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## 🚀 Installation
+
+```bash
+git clone <repository-url>
+cd DriveLink
+npm install
+expo start
+````
+
+---
+
+## 📝 Notes
+
+* Each **tab screen** (dashboard, cars, managers, etc.) imports its corresponding module component and renders it.
+* **Hooks** handle authentication, role access, and tracking logic.
+* **authUtils** contains reusable authentication helper functions.
+
+---
+
+## 📂 Contributing
+
+* Follow the folder structure strictly for new modules
+* Keep UI minimal and consistent with the design system
+* Use card-based layouts for all new screens
+* Maintain proper separation of **components, hooks, services, and stores**
+
+---
+
+## 📄 License
+
+
+
+```
+
+---
+
+If you want, I can also **add a visual diagram of the folder structure** inside this README for better clarity — like a GitHub-style tree diagram with icons for modules, tabs, and components.  
+
+Do you want me to do that?
+```
