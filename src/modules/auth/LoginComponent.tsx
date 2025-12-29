@@ -6,36 +6,35 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { AuthService } from "../../shared/services/auth-service";
+import { validateEmail, validatePassword } from "./authUtils";
 
 const LoginComponent = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  // Mock user data for testing
-  const mockUsers = [
-    { email: "owner@drivelink.com", password: "owner123", role: "owner" },
-    { email: "manager@drivelink.com", password: "manager123", role: "manager" },
-    { email: "driver@drivelink.com", password: "driver123", role: "driver" },
-    { email: "test@test.com", password: "test123", role: "driver" }, // Default test account
-  ];
-
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert("Error", "Please enter both email and password");
       return;
     }
 
-    // Find user in mock data
-    const user = mockUsers.find(
-      (u) => u.email === email && u.password === password
-    );
+    if (!validateEmail(email)) {
+      Alert.alert("Error", "Please enter a valid email address");
+      return;
+    }
 
-    if (user) {
+    setIsLoading(true);
+    try {
+      const authResponse = await AuthService.login({ email, password });
+
       // Redirect based on role
-      switch (user.role) {
+      switch (authResponse.role) {
         case "owner":
           router.replace("/(owner)/dashboard");
           break;
@@ -46,21 +45,18 @@ const LoginComponent = () => {
           router.replace("/(driver)/dashboard");
           break;
         default:
-          Alert.alert("Error", "Invalid role");
+          Alert.alert("Error", "Invalid role configuration");
       }
-    } else {
-      Alert.alert("Login Failed", "Invalid email or password");
+    } catch (error: any) {
+      console.error("Login error:", error);
+      Alert.alert("Login Failed", error.message || "Invalid email or password");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleRegisterPress = () => {
     router.push("/(auth)/register");
-  };
-
-  // Quick login buttons for testing
-  const handleQuickLogin = (testEmail: string, testPassword: string) => {
-    setEmail(testEmail);
-    setPassword(testPassword);
   };
 
   return (
@@ -81,6 +77,7 @@ const LoginComponent = () => {
             onChangeText={setEmail}
             autoCapitalize="none"
             keyboardType="email-address"
+            editable={!isLoading}
           />
         </View>
 
@@ -93,48 +90,28 @@ const LoginComponent = () => {
             value={password}
             onChangeText={setPassword}
             secureTextEntry
+            editable={!isLoading}
           />
         </View>
 
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Sign In</Text>
+        <TouchableOpacity
+          style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
+          onPress={handleLogin}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <Text style={styles.loginButtonText}>Sign In</Text>
+          )}
         </TouchableOpacity>
-
-        {/* Quick Login Buttons for Testing */}
-        <View style={styles.quickLoginContainer}>
-          <Text style={styles.quickLoginTitle}>Quick Login (Testing)</Text>
-          <View style={styles.quickLoginButtons}>
-            <TouchableOpacity
-              style={[styles.quickButton, styles.ownerButton]}
-              onPress={() =>
-                handleQuickLogin("owner@drivelink.com", "owner123")
-              }
-            >
-              <Text style={styles.quickButtonText}>Owner</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.quickButton, styles.managerButton]}
-              onPress={() =>
-                handleQuickLogin("manager@drivelink.com", "manager123")
-              }
-            >
-              <Text style={styles.quickButtonText}>Manager</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.quickButton, styles.driverButton]}
-              onPress={() =>
-                handleQuickLogin("driver@drivelink.com", "driver123")
-              }
-            >
-              <Text style={styles.quickButtonText}>Driver</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>Don't have an account? </Text>
-          <TouchableOpacity onPress={handleRegisterPress}>
-            <Text style={styles.footerLink}>Register</Text>
+          <TouchableOpacity onPress={handleRegisterPress} disabled={isLoading}>
+            <Text style={[styles.footerLink, isLoading && styles.disabledLink]}>
+              Register
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -204,48 +181,14 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
+  loginButtonDisabled: {
+    backgroundColor: "#666666",
+    opacity: 0.7,
+  },
   loginButtonText: {
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "600",
-  },
-  quickLoginContainer: {
-    marginTop: 24,
-    paddingTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: "#F0F0F0",
-  },
-  quickLoginTitle: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#666666",
-    marginBottom: 12,
-    textAlign: "center",
-  },
-  quickLoginButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 8,
-  },
-  quickButton: {
-    flex: 1,
-    borderRadius: 8,
-    paddingVertical: 10,
-    alignItems: "center",
-  },
-  ownerButton: {
-    backgroundColor: "#1A1A1A",
-  },
-  managerButton: {
-    backgroundColor: "#2D2D2D",
-  },
-  driverButton: {
-    backgroundColor: "#3D3D3D",
-  },
-  quickButtonText: {
-    color: "#FFFFFF",
-    fontSize: 12,
-    fontWeight: "500",
   },
   footer: {
     flexDirection: "row",
@@ -263,6 +206,9 @@ const styles = StyleSheet.create({
     color: "#1A1A1A",
     fontSize: 14,
     fontWeight: "600",
+  },
+  disabledLink: {
+    opacity: 0.5,
   },
 });
 

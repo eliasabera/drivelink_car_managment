@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,8 +8,11 @@ import {
   ScrollView,
   SafeAreaView,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { useAuthStore } from "../../shared/store/auth-store";
+import { validateEmail, validatePassword } from "./authUtils";
 
 const RegisterComponent = () => {
   const [name, setName] = useState("");
@@ -19,9 +22,34 @@ const RegisterComponent = () => {
   const [role, setRole] = useState("driver");
   const router = useRouter();
 
-  const handleRegister = () => {
+  const { register, isLoading, error, clearError } = useAuthStore();
+
+  // Clear error when component mounts or inputs change
+  useEffect(() => {
+    clearError();
+  }, [name, email, password, confirmPassword, role]);
+
+  // Show error alerts
+  useEffect(() => {
+    if (error) {
+      Alert.alert("Registration Error", error);
+    }
+  }, [error]);
+
+  const handleRegister = async () => {
     if (!name || !email || !password || !confirmPassword) {
       Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      Alert.alert("Error", "Please enter a valid email address");
+      return;
+    }
+
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      Alert.alert("Error", passwordValidation.message);
       return;
     }
 
@@ -30,25 +58,20 @@ const RegisterComponent = () => {
       return;
     }
 
-    if (password.length < 6) {
-      Alert.alert("Error", "Password must be at least 6 characters");
-      return;
-    }
+    try {
+      const registerData = {
+        email,
+        password,
+        full_name: name,
+        role: role as "driver" | "manager" | "owner" | "admin",
+      };
 
-    // Mock registration - just redirect to appropriate dashboard
-    Alert.alert("Success", "Account created successfully!");
-
-    // Redirect based on selected role
-    switch (role) {
-      case "owner":
-        router.replace("/(owner)/dashboard");
-        break;
-      case "manager":
-        router.replace("/(manager)/dashboard");
-        break;
-      case "driver":
-        router.replace("/(driver)/dashboard");
-        break;
+      await register(registerData);
+      // Navigation will be handled by the auth store
+      Alert.alert("Success", "Account created successfully!");
+    } catch (error: any) {
+      // Error is already handled by the store
+      console.error("Registration error:", error);
     }
   };
 
@@ -76,6 +99,7 @@ const RegisterComponent = () => {
               placeholderTextColor="#9E9E9E"
               value={name}
               onChangeText={setName}
+              editable={!isLoading}
             />
           </View>
 
@@ -89,6 +113,7 @@ const RegisterComponent = () => {
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
+              editable={!isLoading}
             />
           </View>
 
@@ -96,11 +121,12 @@ const RegisterComponent = () => {
             <Text style={styles.label}>Password</Text>
             <TextInput
               style={styles.input}
-              placeholder="Create a password"
+              placeholder="Create a password (min. 6 characters)"
               placeholderTextColor="#9E9E9E"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
+              editable={!isLoading}
             />
           </View>
 
@@ -113,6 +139,7 @@ const RegisterComponent = () => {
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry
+              editable={!isLoading}
             />
           </View>
 
@@ -125,8 +152,10 @@ const RegisterComponent = () => {
                   style={[
                     styles.roleButton,
                     role === roleItem && styles.roleButtonActive,
+                    isLoading && styles.roleButtonDisabled,
                   ]}
                   onPress={() => setRole(roleItem)}
+                  disabled={isLoading}
                 >
                   <Text
                     style={[
@@ -142,16 +171,28 @@ const RegisterComponent = () => {
           </View>
 
           <TouchableOpacity
-            style={styles.registerButton}
+            style={[
+              styles.registerButton,
+              isLoading && styles.registerButtonDisabled,
+            ]}
             onPress={handleRegister}
+            disabled={isLoading}
           >
-            <Text style={styles.registerButtonText}>Create Account</Text>
+            {isLoading ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <Text style={styles.registerButtonText}>Create Account</Text>
+            )}
           </TouchableOpacity>
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>Already have an account? </Text>
-            <TouchableOpacity onPress={handleLoginPress}>
-              <Text style={styles.footerLink}>Sign In</Text>
+            <TouchableOpacity onPress={handleLoginPress} disabled={isLoading}>
+              <Text
+                style={[styles.footerLink, isLoading && styles.disabledLink]}
+              >
+                Sign In
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -234,6 +275,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#1A1A1A",
     borderColor: "#1A1A1A",
   },
+  roleButtonDisabled: {
+    opacity: 0.5,
+  },
   roleButtonText: {
     fontSize: 14,
     fontWeight: "500",
@@ -253,6 +297,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  registerButtonDisabled: {
+    backgroundColor: "#666666",
+    opacity: 0.7,
   },
   registerButtonText: {
     color: "#FFFFFF",
@@ -275,6 +323,9 @@ const styles = StyleSheet.create({
     color: "#1A1A1A",
     fontSize: 14,
     fontWeight: "600",
+  },
+  disabledLink: {
+    opacity: 0.5,
   },
 });
 
